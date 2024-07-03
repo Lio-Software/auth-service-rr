@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.tmp
+.idea
+coverage/
+.npm
+.vscode
+.nyc_output
+.env
+uploads/
