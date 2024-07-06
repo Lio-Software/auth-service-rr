@@ -1,4 +1,4 @@
-import { AuthInterface } from "@src/domain/interfaces/auth.interface";
+import { AuthInterface } from "../../domain/interfaces/auth.interface";
 import signale from "signale";
 
 export class RefreshTokenUseCase {
