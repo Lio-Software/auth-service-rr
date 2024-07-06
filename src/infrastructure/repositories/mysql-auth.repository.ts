@@ -4,7 +4,7 @@ import { VerifyTokenResponse } from "../../domain/entities/dtos/responses/verify
 import { UserEntity } from "../../domain/entities/user.entity";
 import { AuthInterface } from "../../domain/interfaces/auth.interface";
 import { BcryptUtils } from "../utils/bcrypt.utils";
-import { createAccessToken, createRefreshToken, validateToken, refrshToken } from "../utils/jwt.utils";
+import { createAccessToken, createRefreshToken, validateToken, refreshAccessToken, decodeToken } from "../utils/jwt.utils";
 
 export class MysqlAuthRepository implements AuthInterface {
     public async registerUser(user: UserEntity): Promise<string | null> {
@@ -30,8 +30,8 @@ export class MysqlAuthRepository implements AuthInterface {
         if (isValid) {
             const foundUser = await this.getUserByEmail(email);
 
-            const accessToken = await createAccessToken({ foundUser });
-            const refreshToken = await createRefreshToken();
+            const accessToken = await createAccessToken(foundUser?.firstName ?? '', foundUser?.lastName ?? '', foundUser?.email ?? '', foundUser?.uuid ?? '');
+            const refreshToken = await createRefreshToken(foundUser?.uuid || '');
             return new AuthUserResponse(accessToken, refreshToken);
         }
         return null;
@@ -41,7 +41,7 @@ export class MysqlAuthRepository implements AuthInterface {
         const isValid = await validateToken(refreshToken);
 
         if (isValid) {
-            const newAccessToken = await refrshToken(accessToken);
+            const newAccessToken = await refreshAccessToken(accessToken);
             return newAccessToken;
         }
         return null;
@@ -52,6 +52,13 @@ export class MysqlAuthRepository implements AuthInterface {
     }
 
     public async verifyToken(accessToken: string): Promise<VerifyTokenResponse | null> {
+        const isValid = await validateToken(accessToken);
+
+        if (isValid) {
+            const decodedToken = await decodeToken(accessToken) as { [key: string]: any };
+
+            return new VerifyTokenResponse(true, decodedToken.data.uuid, decodedToken.data.email);
+        }
         return null;
     }
 
