@@ -1,4 +1,4 @@
-import { AuthUserResponse } from "@src/domain/entities/dtos/responses/auth-user.response";
+import { AuthUserResponse } from "../../domain/entities/dtos/responses/auth-user.response";
 import { AuthInterface } from "../../domain/interfaces/auth.interface";
 import signale from "signale";
 

@@ -10,8 +10,8 @@ export interface UserAttributes {
 }
 
 @Table({
-    tableName: 'users',
-    modelName: 'User',
+    tableName: "users",
+    modelName: "User",
     timestamps: true,
 })
 
