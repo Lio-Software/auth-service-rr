@@ -1,23 +1,25 @@
+import { RegisterUserRequest } from "../../domain/entities/dtos/requests/register-user.request";
 import UserModel from "../../database/mysql/models/user.model";
 import { AuthUserResponse } from "../../domain/entities/dtos/responses/auth-user.response";
 import { VerifyTokenResponse } from "../../domain/entities/dtos/responses/verify-token.response";
-import { UserEntity } from "../../domain/entities/user.entity";
 import { AuthInterface } from "../../domain/interfaces/auth.interface";
 import { BcryptUtils } from "../utils/bcrypt.utils";
 import { createAccessToken, createRefreshToken, validateToken, refreshAccessToken, decodeToken } from "../utils/jwt.utils";
+import { AccessTokenPayload } from "../../domain/entities/dtos/requests/access-token-payload";
 
 export class MysqlAuthRepository implements AuthInterface {
-    public async registerUser(user: UserEntity): Promise<string | null> {
-        const foundUser = await UserModel.findOne({ where: { email: user.email } });
+    public async registerUser(request: RegisterUserRequest): Promise<string | null> {
+        const foundUser = await UserModel.findOne({ where: { email: request.email } });
 
-        const encryptedPassword = await BcryptUtils.hash(user.password);
+        const encryptedPassword = await BcryptUtils.hash(request.password);
 
         if (foundUser === null) {
             const createdUser = await UserModel.create({
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
+                firstName: request.firstName,
+                lastName: request.lastName,
+                email: request.email,
                 password: encryptedPassword,
+                phoneNumber: request.phoneNumber,
             });
             return createdUser.uuid;
         }
@@ -30,7 +32,9 @@ export class MysqlAuthRepository implements AuthInterface {
         if (isValid) {
             const foundUser = await this.getUserByEmail(email);
 
-            const accessToken = await createAccessToken(foundUser?.firstName ?? '', foundUser?.lastName ?? '', foundUser?.email ?? '', foundUser?.uuid ?? '');
+            const accessTokenPayload: AccessTokenPayload = new AccessTokenPayload(foundUser?.firstName ?? '', foundUser?.lastName ?? '', foundUser?.email ?? '', foundUser?.phoneNumber ?? '', foundUser?.image_url ?? '', foundUser?.uuid ?? '');
+
+            const accessToken = await createAccessToken(accessTokenPayload);
             const refreshToken = await createRefreshToken(foundUser?.uuid || '');
             return new AuthUserResponse(accessToken, refreshToken);
         }

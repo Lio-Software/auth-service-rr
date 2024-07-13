@@ -1,18 +1,12 @@
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { AccessTokenPayload } from "../../domain/entities/dtos/requests/access-token-payload";
 
-const createAccessToken = async (firstName: string, lastName: string, email: string, uuid: string) => {
+const createAccessToken = async (payloadData: AccessTokenPayload) => {
     dotenv.config();
 
-    const data = {
-        firstName,
-        lastName,
-        email,
-        uuid,
-    };
-
     const payload = {
-        data,
+        data: payloadData,
         type: "access",
     };
 

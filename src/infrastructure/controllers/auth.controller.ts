@@ -3,19 +3,29 @@ import { LoginUseCase } from "../../application/use-cases/login.use-case";
 import { RegisterUseCase } from "../../application/use-cases/register.use-case";
 import { Request, Response } from "express";
 import { VerifyTokenUseCase } from "../../application/use-cases/verify-token.use-case";
+import { BaseResponse } from "../../domain/entities/dtos/responses/base.response";
+import { RegisterUserRequest } from "@src/domain/entities/dtos/requests/register-user.request";
 
 export class AuthController {
 	constructor(readonly registerUseCase: RegisterUseCase, readonly loginUseCase: LoginUseCase, readonly refreshTokenUseCase: RefreshTokenUseCase, readonly verifyTokenUseCase: VerifyTokenUseCase) { }
 
 	async register(req: Request, res: Response) {
-		const { firstName, lastName, email, password } = req.body;
+		const request: RegisterUserRequest = req.body;
 
-		const userId = await this.registerUseCase.execute(firstName, lastName, email, password);
+		try {
+			const userId = await this.registerUseCase.execute(request);
 
-		if (!userId) {
-			return res.status(500).json({ message: "Failed to register user" });
+			const response = new BaseResponse({ userId }, "User registered successfully!");
+
+			return res.status(201).json(response);
+		} catch (error: any) {
+			const errors = (error as any).errors.map((err: any) => err.message);
+
+			const response = new BaseResponse({}, errors);
+
+			return res.status(500).json(response);
 		}
-		return res.status(201).json({ message: "User registered successfully!", userId });
+
 	}
 
 	async login(req: Request, res: Response) {
@@ -24,12 +34,16 @@ export class AuthController {
 		const authUserResponse = await this.loginUseCase.execute(email, password);
 
 		if (!authUserResponse) {
-			return res.status(401).json({ message: "Failed to authenticate user" });
+			const response = new BaseResponse({}, "Failed to authenticate user");
+
+			return res.status(401).json(response);
 		}
 
 		const { accessToken, refreshToken } = authUserResponse;
 
-		return res.status(200).json({ message: "User authenticated successfully!", accessToken, refreshToken });
+		const response = new BaseResponse({ accessToken, refreshToken }, "User authenticated successfully!");
+
+		return res.status(200).json(response);
 	}
 
 	async refreshToken(req: Request, res: Response) {
@@ -38,20 +52,28 @@ export class AuthController {
 		const token = await this.refreshTokenUseCase.execute(refreshToken, accessToken);
 
 		if (!token) {
-			return res.status(500).json({ message: "Failed to refresh token" });
+			const response = new BaseResponse({}, "Failed to refresh token");
+
+			return res.status(500).json(response);
 		}
 
-		return res.status(200).json({ message: "Token refreshed successfully!", accessToken: token });
+		const response = new BaseResponse({ accessToken: token }, "Token refreshed successfully!");
+
+		return res.status(200).json(response);
 	}
 
 	async verifyToken(req: Request, res: Response) {
 		const { accessToken } = req.body;
 
-		const response = await this.verifyTokenUseCase.execute(accessToken);
+		const data = await this.verifyTokenUseCase.execute(accessToken);
 
-		if (!response) {
-			return res.status(401).json({ message: "Failed to verify token" });
+		if (!data) {
+			const response = new BaseResponse({}, "Failed to verify token");
+
+			return res.status(401).json(response);
 		}
+
+		const response = new BaseResponse(data, "Token verified successfully!");
 
 		return res.status(200).json({ message: "Token verified successfully!", data: response });
 	}
