@@ -1,9 +1,9 @@
+import { RegisterUserRequest } from "../entities/dtos/requests/register-user.request";
 import { AuthUserResponse } from "../entities/dtos/responses/auth-user.response";
 import { VerifyTokenResponse } from "../entities/dtos/responses/verify-token.response";
-import { UserEntity } from "../entities/user.entity";
 
 export interface AuthInterface {
-    registerUser(user: UserEntity): Promise<string | null>;
+    registerUser(user: RegisterUserRequest): Promise<string | null>;
     authenticateUser(email: string, password: string): Promise<AuthUserResponse | null>;
     refreshAccessToken(refreshToken: string, accessToken: string): Promise<string | null>;
     logout(refreshToken: string): Promise<boolean>;
