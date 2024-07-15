@@ -32,7 +32,7 @@ export class MysqlAuthRepository implements AuthInterface {
         if (isValid) {
             const foundUser = await this.getUserByEmail(email);
 
-            const accessTokenPayload: AccessTokenPayload = new AccessTokenPayload(foundUser?.firstName ?? '', foundUser?.lastName ?? '', foundUser?.email ?? '', foundUser?.phoneNumber ?? '', foundUser?.image_url ?? '', foundUser?.uuid ?? '');
+            const accessTokenPayload: AccessTokenPayload = new AccessTokenPayload(foundUser?.firstName ?? '', foundUser?.lastName ?? '', foundUser?.email ?? '', foundUser?.phoneNumber ?? '', foundUser?.imageUrl ?? '', foundUser?.uuid ?? '');
 
             const accessToken = await createAccessToken(accessTokenPayload);
             const refreshToken = await createRefreshToken(foundUser?.uuid || '');

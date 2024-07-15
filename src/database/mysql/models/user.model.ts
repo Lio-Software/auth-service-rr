@@ -1,5 +1,4 @@
 import { Column, DataType, Model, Table } from "sequelize-typescript";
-import { validate } from "uuid";
 
 export interface UserAttributes {
     id: number;
@@ -8,14 +7,14 @@ export interface UserAttributes {
     email: string;
     password: string;
     phoneNumber: string;
-    image_url: string;
+    imageUrl: string;
     uuid: string;
 }
 
 @Table({
     tableName: "users",
     modelName: "User",
-    timestamps: true,
+    timestamps: false,
 })
 
 export default class UserModel extends Model implements UserAttributes {
@@ -72,7 +71,7 @@ export default class UserModel extends Model implements UserAttributes {
         allowNull: true,
         type: DataType.STRING,
     })
-    declare image_url: string;
+    declare imageUrl: string;
 
     @Column({
         allowNull: true,

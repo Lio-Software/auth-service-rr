@@ -5,8 +5,6 @@ import morgan from 'morgan';
 import syncConnection from "./database/mysql/connection";
 import { } from '../tsconfig.json';
 import cors from 'cors';
-import busboy from 'connect-busboy';
-import compression from "compression";
 import { authRouter } from "./infrastructure/routers/auth-router";
 
 export const app = express();
@@ -15,9 +13,7 @@ const logger = new Signale();
 dotenv.config();
 app.use(express.json());
 app.use(morgan('dev'));
-app.use(busboy());
 app.use(express.urlencoded({ extended: false }));
-app.use(compression());
 const PORT = process.env.PORT || 3001;
 const API_PREFIX = process.env.API_PREFIX || '/api/v1';
 
