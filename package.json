@@ -21,8 +21,7 @@
     "mysql2": "^3.9.4",
     "sequelize-typescript": "^2.1.6",
     "signale": "^1.4.0",
-    "ts-node": "^10.9.2",
-    "tsnd": "^1.1.0",
+    "ts-node-dev": "^2.0.0",
     "uuid": "^9.0.1"
   },
   "devDependencies": {
