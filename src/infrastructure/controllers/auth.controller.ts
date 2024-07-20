@@ -75,6 +75,6 @@ export class AuthController {
 
 		const response = new BaseResponse(data, "Token verified successfully!");
 
-		return res.status(200).json({ message: "Token verified successfully!", data: response });
+		return res.status(200).json(response);
 	}
 }
